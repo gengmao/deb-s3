@@ -76,7 +76,7 @@ class Deb::S3::CLI < Thor
   :desc     => "Whether to use HTTP or HTTPS for request transport."
 
   class_option :visibility,
-  :default  => "public",
+  :default  => "private",
   :type     => :string,
   :aliases  => "-v",
   :desc     => "The access policy for the uploaded files. " +
