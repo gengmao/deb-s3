@@ -99,6 +99,17 @@ class Deb::S3::Manifest
     @packages.collect { |pkg| pkg.generate }.join("\n")
   end
 
+  def check_s3
+    unless self.skip_package_upload
+      # check any packages that may aleady exists
+      @packages_to_be_upload.each do |pkg|
+        yield pkg.url_filename if block_given?
+        s3_check(pkg.filename, pkg.url_filename, self.fail_if_exists)
+      end
+    end
+  end
+
+
   def write_to_s3
     manifest = self.generate
 

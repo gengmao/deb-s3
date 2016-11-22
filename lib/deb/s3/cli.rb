@@ -235,6 +235,16 @@ class Deb::S3::CLI < Thor
         end
       end
 
+      # check s3 for existing package, error out if package exists
+      log("check for existing package on s3")
+      manifests.each_value do |manifest|
+        begin
+          manifest.check_s3 { |f| sublog("Checking #{f}") }
+        rescue Deb::S3::Utils::AlreadyExistsError => e
+          error("Uploading failed because: #{e}")
+        end
+      end
+ 
       # upload the manifest
       log("Uploading packages and new manifests to S3")
       manifests.each_value do |manifest|
@@ -245,6 +255,7 @@ class Deb::S3::CLI < Thor
         end
         release.update_manifest(manifest)
       end
+
       release.write_to_s3 { |f| sublog("Transferring #{f}") }
 
       log("Update complete.")
