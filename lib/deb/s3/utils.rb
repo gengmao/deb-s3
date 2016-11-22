@@ -64,6 +64,16 @@ module Deb::S3::Utils
     Deb::S3::Utils.s3.buckets[Deb::S3::Utils.bucket].objects[s3_path(path)].read
   end
 
+  def s3_check(path, filename=nil, fail_if_exists=false)
+    filename = File.basename(path) unless filename
+    obj = Deb::S3::Utils.s3.buckets[Deb::S3::Utils.bucket].objects[s3_path(filename)]
+
+    # check if the object already exists
+    if obj.exists?
+      raise AlreadyExistsError, "file #{obj.public_url} already exists" if fail_if_exists
+    end
+  end
+
   def s3_store(path, filename=nil, content_type='application/octet-stream; charset=binary', cache_control=nil, fail_if_exists=false)
     filename = File.basename(path) unless filename
     obj = Deb::S3::Utils.s3.buckets[Deb::S3::Utils.bucket].objects[s3_path(filename)]
